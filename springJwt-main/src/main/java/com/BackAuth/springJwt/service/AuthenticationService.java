@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +53,9 @@ public class AuthenticationService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setAccountNonExpired(true);
 
-
+        LocalDateTime now=LocalDateTime.now();
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
         user.setRole(request.getRole());
 
         user = repository.save(user);
@@ -77,19 +80,21 @@ public class AuthenticationService {
         String jwt = jwtService.generateToken(user);
 
         revokeAllTokenByUser(user);
-        saveUserToken(jwt, user);
+        saveUserToken(jwt,user);
 
-        return new AuthenticationResponse(jwt, "User login was successful");
+        return new AuthenticationResponse(jwt,"User login was successful");
 
     }
 
     public AuthenticationResponse updateUser (User user,String userName ) {
         User ExistingUser = repository.findByUsername(userName).orElse(null);
         if(ExistingUser != null) {
+            LocalDateTime now=LocalDateTime.now();
             ExistingUser.setFirstName(user.getFirstName());
             ExistingUser.setLastName(user.getLastName());
             ExistingUser.setEmail(user.getEmail());
             ExistingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            ExistingUser.setUpdatedAt(now);
             repository.save(ExistingUser);
 
             String jwt=jwtService.generateToken(ExistingUser);
