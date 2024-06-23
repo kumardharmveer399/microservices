@@ -40,7 +40,7 @@ API Endpoints
       
        logout
       URL: /logout
-      Method: POST
+      
 
    Customer Management
       Create Customer
